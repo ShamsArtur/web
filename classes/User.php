@@ -1,9 +1,6 @@
 ﻿<?php
 require_once('/classes/facebook/facebook.php');
 
-
-
-
 class user
 {
     public $id;
@@ -24,10 +21,12 @@ class user
             "fields" => "id,link,birthday,name,gender,groups{id,name,administrator},likes{access_token,name,id,can_post},friends{name,id}",
             "access_token" => $accessToken
         );
+
         $data = Facebook::cURL('get', $url, $params);
         if (isset($data['id']))
             $this->id = $data['id'];
-        else return;
+        else
+            return;
         $this->name = $data['name'];
         if (isset($data['birthday']))
             $this->birthday = $data['birthday'];
@@ -43,8 +42,6 @@ class user
         $this->access_token = $accessToken;
         $this->friends=$data['friends']['data'];
         $this->gender = $data['gender'];
-        //echo '<br><br><br>';
-        //print_r($data);
     }
     public function getFriends()
     {
@@ -97,33 +94,6 @@ class user
         if (!is_bool($this->picture))
             echo '<img src="http://graph.facebook.com/' . $this->getID() . '/picture?type=large">';
     }
-
-
 }
-    Class group
-    {
-        var $id;
-        var $name;
-        var $is_admin;
-
-        function __construct($data)
-        {
-            $this->id = $data['id'];
-            $this->name = $data['name'];
-            $this->is_admin = $data['is_admin'];
-        }
-        function is_admin()
-        {
-            return $this->is_admin;
-        }
-        function get_name()
-        {
-            return $this->name;
-        }
-        function get_id()
-        {
-            return $this->id;
-        }
-    }
 
 ?>

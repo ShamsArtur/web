@@ -2,7 +2,6 @@
 require_once('/config.php');
 require_once('/classes/Facebook/User.php');
 
-//require 'classes/facebook/user.php';
 class Facebook
 {
     public $params = array();
@@ -31,15 +30,17 @@ class Facebook
             "client_secret" => $this->params['client_secret'],
             "redirect_uri" => $this->params['redirect_uri'],
         );
-        //echo '<br>asdasdasdasd<br><br>';
-        return preg_replace('/(&expires=\d+)|(access_token=)/', '',self::cURL('post', $url, $token_params));
+        echo '<br><br><br><br>';
+        $response = json_decode(self::cURL('post', $url, $token_params), true);
+        //echo preg_replace('/(&expires=\d+)|(access_token=)| /', '', self::cURL('post', $url, $token_params));
+        return $response['access_token'];
     }
 
     public function getUser($access_token)
     {
         return new User($access_token);
     }
-
+    
     public static function cURL($method, $url, $params)
     {
         if ($method == 'get' || $method == 'post') {
