@@ -6,10 +6,10 @@ class Facebook
 {
     public $params = array();
 
-    public function __construct()
+    public function __construct($code)
     {
         //session_start();
-        $this->params['code'] = $_SESSION['code'];
+        $this->params['code'] = $code;
         $this->params['client_id'] = $GLOBALS['client_id'];
         $this->params['redirect_uri'] = $GLOBALS['redirect_uri'];
         $this->params['client_secret'] = $GLOBALS['client_secret'];
@@ -30,7 +30,7 @@ class Facebook
             "client_secret" => $this->params['client_secret'],
             "redirect_uri" => $this->params['redirect_uri'],
         );
-        echo '<br><br><br><br>';
+
         $response = json_decode(self::cURL('post', $url, $token_params), true);
         //echo preg_replace('/(&expires=\d+)|(access_token=)| /', '', self::cURL('post', $url, $token_params));
         return $response['access_token'];
@@ -40,7 +40,7 @@ class Facebook
     {
         return new User($access_token);
     }
-    
+
     public static function cURL($method, $url, $params)
     {
         if ($method == 'get' || $method == 'post') {
@@ -64,6 +64,39 @@ class Facebook
             else return $res;
         } else
             return;
+    }
+
+    public static function toXML($data)
+    {
+        $arr = json_decode($data, true);
+        $xml = new SimpleXMLElement('<root/>');
+        //$arr = array_reverse($arr);
+        array_walk_recursive($arr, array($xml, 'addChild'));
+        return $xml->asXML();
+    }
+
+    static function ObjecttoJSON($object)
+    {
+        return json_encode($object, JSON_UNESCAPED_UNICODE);
+    }
+
+
+    static function JSONtoXML($json)
+    {
+        $xml = new SimpleXMLElement('<data/>');
+        Facebook::arrayToXml(json_decode($json, false), $xml);
+        return html_entity_decode($xml->asXML(), ENT_QUOTES, 'utf-8');
+    }
+
+    static function arrayToXml($array, &$xml)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                Facebook::arrayToXml($value, $xml->addChild($key));
+            } else {
+                $xml->addChild($key, htmlspecialchars($value));
+            }
+        }
     }
 }
 
